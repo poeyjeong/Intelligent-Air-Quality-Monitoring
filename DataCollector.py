@@ -14,8 +14,8 @@ import gc
 tft = tft_config.config(1)
 
 sensorDHT_power = Pin(4, Pin.OUT)  # Power pin for DHT22 sensor
-sensorDHT = dht.DHT22(machine.Pin(3)) # DHT22 Pin
-ldr = Pin(14, Pin.IN) # Motion detector Pin
+sensorDHT = dht.DHT22(machine.Pin(22)) # DHT22 Pin
+ldr = Pin(12, Pin.IN) # Motion detector Pin
 
 # -----------------------------------------------------------
 

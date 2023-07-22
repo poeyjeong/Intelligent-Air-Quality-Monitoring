@@ -6,14 +6,9 @@ import machine
 import network
 import urequests
 
-# DHT22 Pin
-sensorDHT = dht.DHT22(machine.Pin(3))
-
-# Motion detector Pin
-ldr = Pin(14, Pin.IN)
-
-# ThingSpeak Settings
-api_key = "..." # ThingSpeak API key
+sensorDHT = dht.DHT22(machine.Pin(3)) # DHT22 Pin
+ldr = Pin(14, Pin.IN) # Motion detector Pin
+api_key = "..." # ThingSpeak Settings
 
 sleep(2)
 oled_width = 128
@@ -43,20 +38,29 @@ while True:
         sensorDHT.measure()
         temp = sensorDHT.temperature()
         hum = sensorDHT.humidity()
-        print('ldr value = ', ldr.value())
 
-        # If motion detected, display time, tempurature and humidity
-        if ldr.value() == 1:
+        # Get current time
+        current_time = (machine.RTC().datetime()[4] * 60 * 60) + (machine.RTC().datetime()[5] * 60) + machine.RTC().datetime()[6]
+
+        # If it has been 30 seconds since the last update, send data to ThingSpeak
+        if current_time - last_update >= 30:
             response = urequests.get(
                 f'https://api.thingspeak.com/update?api_key={api_key}&field1={temp}&field2={hum}&field3={ldr.value()}')
             response.close()
+            print('Data sent to ThingSpeak')
+
+            # Update last_update variable
+            last_update = current_time
+        
+        # If motion detected, display time, tempurature and humidity
+        if ldr.value() == 1:
             print('OBJECT DETECTED')
             oled.fill(0)
-            oled.text(string = 'Time: '+now, x=2, y=2)
-            oled.text('-'*oled_width, 2, 10)
+            oled.text(string="Date: " + now, x=2, y=2)
+            oled.text(string="Time: " + now, x=2, y=12)
+            oled.text('-'*oled_width, 2, 20)
             oled.text('Temp: '+str(temp)+'C',2,30,1)
             oled.text('Humid: '+str(hum)+'%',2,40,1)
-            oled.text('ip: ' + sta_if.ifconfig()[0], 2, 50, 1)
             oled.show()
             sleep(3)
 
@@ -67,6 +71,9 @@ while True:
             # It's important to call show() to make the changes visible
             oled.show()
 
+            # Sleep for a second to avoid constantly polling sensors
+        sleep(1)
+
     except OSError as e:
-        print('Failed to read sensor')
         sleep(0.5)
+        pass

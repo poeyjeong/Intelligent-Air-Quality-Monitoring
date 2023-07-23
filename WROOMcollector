@@ -48,7 +48,6 @@ rtc.datetime((actual_time[0], actual_time[1], actual_time[2], 0, actual_time[3],
 while True:
     # Get current time
     t = rtc.datetime()
-    #now = '{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}'.format(t[0], t[1], t[2], t[4], t[5], t[6])
     date_str = '{:04d}-{:02d}-{:02d}'.format(t[0], t[1], t[2])
     time_str = '{:02d}:{:02d}:{:02d}'.format(t[4], t[5], t[6])
     # {:04d} =  width of 4 digits
@@ -58,22 +57,6 @@ while True:
         sensorDHT.measure()
         temp = sensorDHT.temperature()
         hum = sensorDHT.humidity()
-
-        if ldr.value() == 1:
-            print('OBJECT DETECTED')
-            oled.fill(0)
-            oled.text(string="Time: " + now, x=2, y=2)
-            oled.text('-' * oled_width, 2, 10)
-            oled.text("Temp: " + str(temp) + " C", 2, 30, 1)
-            oled.text("Humid: " + str(hum) + " %", 2, 40, 1)
-            oled.show()
-            sleep(2)
-
-        else:
-            # If no motion detected, display nothing
-            oled.fill(0)
-            # it is important to call show() to make the changes visible
-            oled.show()
 
         current_time = (machine.RTC().datetime()[4] * 60 * 60) + (machine.RTC().datetime()[5] * 60) + machine.RTC().datetime()[6]
         # If it has been 1 min since the last update, send data to Firebase
@@ -85,8 +68,26 @@ while True:
           # Update last_update variable
           last_update = current_time
 
+        if ldr.value() == 1:
+            print('OBJECT DETECTED')
+            oled.fill(0)
+            oled.text("Date/Time:", 2, 2)
+            oled.text(date_str, 2, 12)
+            oled.text(time_str, 2, 22)
+            oled.text('-' * oled_width, 2, 30)
+            oled.text("Temp: " + str(temp) + " C", 2, 40, 1)
+            oled.text("Humid: " + str(hum) + " %", 2, 50, 1)
+            oled.show()
+            sleep(3)
+
+        else:
+            # If no motion detected, display nothing
+            oled.fill(0)
+            # it is important to call show() to make the changes visible
+            oled.show()
+
         gc.collect()
-        sleep(0.5)
+        sleep(1)
 
     except Exception as e:
         machine.reset()

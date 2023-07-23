@@ -1,33 +1,26 @@
-from machine import Pin, SoftI2C, PWM
+from machine import Pin
 from time import sleep
-import ssd1306
 import dht
 import machine
 import network
-import urequests
+import ufirebase
 import ntptime
 import time
+import gc
 
-i2c = SoftI2C(scl=Pin(4), sda=Pin(2)) # SSD Pin
-sensorDHT = dht.DHT22(machine.Pin(13)) # DHT22 Pin
-ldr = Pin(15, Pin.IN) # Motion detector Pin
-
-sleep(2)
-oled_width = 128
-oled_height = 64
-oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
+sensorDHT = dht.DHT22(machine.Pin(15)) # DHT22 Pin
 
 # -----------------------------------------------------------
 
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
-sta_if.connect('IoTC604', 'ccsadmin') #name and password
-while not sta_if.isconnected():
-  oled.text(string="Connecting...", x=20, y=20)
-  sleep(0.2)
-oled.text(string="WiFi Connected!", x=18, y=20)
+if not sta_if.isconnected():
+  sta_if.connect('...', '...') #name and password
+  while not sta_if.isconnected():
+    sleep(0.2)
+  print("Connected to Wifi")
 
-ufirebase.setURL('https://temp-n-humid-6401d-default-rtdb.firebaseio.com/')
+ufirebase.setURL('...')
 
 # -----------------------------------------------------------
 
@@ -67,24 +60,6 @@ while True:
 
           # Update last_update variable
           last_update = current_time
-
-        if ldr.value() == 1:
-            print('OBJECT DETECTED')
-            oled.fill(0)
-            oled.text("Date/Time:", 2, 2)
-            oled.text(date_str, 2, 12)
-            oled.text(time_str, 2, 22)
-            oled.text('-' * oled_width, 2, 30)
-            oled.text("Temp: " + str(temp) + " C", 2, 40, 1)
-            oled.text("Humid: " + str(hum) + " %", 2, 50, 1)
-            oled.show()
-            sleep(3)
-
-        else:
-            # If no motion detected, display nothing
-            oled.fill(0)
-            # it is important to call show() to make the changes visible
-            oled.show()
 
         gc.collect()
         sleep(1)

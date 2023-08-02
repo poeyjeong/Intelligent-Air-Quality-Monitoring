@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Air Quality Monitoring</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="data-head">Intelligent Air Quality Monitoring</div>
+    
+    <div class="data-container">
+        <div class="data-item">
+            <h2>Temperature</h2>
+            <p class="value" id="temperature">22 &#8451;</p>
+        </div>
+        <div class="data-item">
+            <h2>Humidity</h2>
+            <p class="value" id="humidity">100%</p>
+        </div>
+    </div>
+
+    <div class="lastest-time">
+        <p class="value" id="date_time">Lastest update: 00/00/00 00:00:00</p>
+    </div>
+
+    <!-- the script for products you want to access must be imported -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
